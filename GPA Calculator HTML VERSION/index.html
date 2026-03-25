@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEB Grade 12 GPA Calculator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- Confetti Layer -->
+<div id="confetti-container"></div>
+
+<div class="container">
+
+  <!-- ── Top Nav ─────────────────────────────────────────────────────────── -->
+  <div class="top-nav">
+    <div class="nav-brand">🏛️ NEB Grading System</div>
+    <div class="nav-actions">
+      <button class="btn-pill" id="history-btn" onclick="toggleHistory()">📊 History</button>
+      <button class="btn-pill" id="marks-btn"   onclick="toggleMarksMode()" title="Toggle raw marks entry">🔢 Marks Mode</button>
+      <button class="btn-pill" id="light-btn"   onclick="toggleLight()" title="Toggle day / night mode">🌙 Night</button>
+      <button class="btn-pill" id="glass-btn"   onclick="toggleGlass()" title="Toggle glassmorphic style">🪟 Glass</button>
+    </div>
+  </div>
+
+  <!-- ── Title ───────────────────────────────────────────────────────────── -->
+  <div class="title-section">
+    <h1>NEB Grade 12 GPA Calculator</h1>
+    <p>Accurate GPA Calculation Based on NEB Grading System</p>
+  </div>
+
+  <!-- ── Semester History Panel ──────────────────────────────────────────── -->
+  <div id="history-panel" class="card" style="display:none">
+    <div class="history-header">
+      <div class="history-title">📊 Semester History</div>
+      <button class="btn-danger-ghost" onclick="clearHistory()">Clear All</button>
+    </div>
+    <div id="history-body"></div>
+  </div>
+
+  <!-- ── Stream Tabs ─────────────────────────────────────────────────────── -->
+  <div class="stream-wrap">
+    <div class="stream-tabs">
+      <button class="stream-tab active-mgmt" id="tab-mgmt" onclick="switchStream('Management')">💼 Management</button>
+      <button class="stream-tab"             id="tab-sci"  onclick="switchStream('Science')">🔬 Science</button>
+    </div>
+  </div>
+  <div class="stream-badge"><span id="stream-desc" class="mgmt"></span></div>
+
+  <!-- ── Student Info ────────────────────────────────────────────────────── -->
+  <div class="card">
+    <div class="student-grid">
+      <div>
+        <div class="field-label">Student Name</div>
+        <input type="text" class="text-input" id="student-name" placeholder="Enter your full name" oninput="saveForm()" />
+      </div>
+      <div>
+        <div class="field-label">Semester Label</div>
+        <input type="text" class="text-input" id="semester-label" placeholder="e.g. Grade 12 · 2081 B.S." oninput="saveForm()" />
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Compulsory Subjects ─────────────────────────────────────────────── -->
+  <div style="margin-bottom:24px">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">Compulsory Subjects</div>
+      <span class="marks-badge" id="marks-mode-badge" style="display:none">Marks Mode — enter raw scores</span>
+    </div>
+    <div class="subjects-grid" id="comp-grid"></div>
+  </div>
+
+  <!-- ── Optional Subjects ──────────────────────────────────────────────── -->
+  <div style="margin-bottom:24px">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">Optional Subjects <span class="section-sub">(Choose 3)</span></div>
+    </div>
+    <div class="subjects-grid" id="opt-grid"></div>
+  </div>
+
+  <!-- ── Live GPA Bar ───────────────────────────────────────────────────── -->
+  <div id="live-bar-wrap" style="display:none"></div>
+
+  <!-- ── NEB Grade Reference ────────────────────────────────────────────── -->
+  <details class="neb-ref">
+    <summary>📖 NEB Grade Scale Reference</summary>
+    <div class="neb-ref-body">
+      <div class="neb-ref-grid">
+        <div>
+          <div class="ref-col-title">Theory (75 marks)</div>
+          <div class="ref-row"><span class="ref-g" style="color:#f59e0b">A+</span><span class="ref-r">67.5–75</span><span class="ref-p">4.0</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#10b981">A</span><span class="ref-r">60–67.5</span><span class="ref-p">3.6</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#f59e0b">B+</span><span class="ref-r">52.5–60</span><span class="ref-p">3.2</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#f59e0b">B</span><span class="ref-r">45–52.5</span><span class="ref-p">2.8</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#ef4444">C+</span><span class="ref-r">37.5–45</span><span class="ref-p">2.4</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#ef4444">C</span><span class="ref-r">30–37.5</span><span class="ref-p">2.0</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#ef4444">D</span><span class="ref-r">27–30</span><span class="ref-p">1.6</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#6b7280">NG</span><span class="ref-r">&lt; 27</span><span class="ref-p">0.0</span></div>
+        </div>
+        <div>
+          <div class="ref-col-title">Internal (25 marks)</div>
+          <div class="ref-row"><span class="ref-g" style="color:#f59e0b">A+</span><span class="ref-r">22.5–25</span><span class="ref-p">4.0</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#10b981">A</span><span class="ref-r">20–22.5</span><span class="ref-p">3.6</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#f59e0b">B+</span><span class="ref-r">17.5–20</span><span class="ref-p">3.2</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#f59e0b">B</span><span class="ref-r">15–17.5</span><span class="ref-p">2.8</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#ef4444">C+</span><span class="ref-r">12.5–15</span><span class="ref-p">2.4</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#ef4444">C</span><span class="ref-r">10–12.5</span><span class="ref-p">2.0</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#ef4444">D</span><span class="ref-r">7.5–10</span><span class="ref-p">1.6</span></div>
+          <div class="ref-row"><span class="ref-g" style="color:#6b7280">NG</span><span class="ref-r">&lt; 7.5</span><span class="ref-p">0.0</span></div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- ── Calculate Button ───────────────────────────────────────────────── -->
+  <div class="calc-wrap">
+    <button class="calc-btn disabled" id="calc-btn" onclick="handleCalculate()">
+      🎓 Calculate GPA
+      <span id="calc-left-hint" class="calc-left-hint" style="display:none"></span>
+    </button>
+  </div>
+
+  <p class="footer">NEB Grade 12 GPA Calculator · Based on official NEB grading system</p>
+</div>
+
+<!-- ── Result Modal ──────────────────────────────────────────────────────── -->
+<div id="modal-overlay" class="modal-overlay" style="display:none" onclick="handleOverlayClick(event)">
+  <div class="modal-box" id="modal-box">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">GPA Result</div>
+        <div class="modal-sub" id="modal-sub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <!-- Circular Gauge + Summary -->
+    <div class="gpa-summary">
+      <div class="gauge-wrap">
+        <svg viewBox="0 0 160 160">
+          <circle cx="80" cy="80" r="60" fill="none" stroke="#2d3561" stroke-width="14" id="gauge-track"/>
+          <circle cx="80" cy="80" r="60" fill="none" stroke-width="14" stroke-linecap="round" id="gauge-fill" style="transition:stroke-dasharray 1s ease"/>
+        </svg>
+        <div class="gauge-center" id="gauge-center"></div>
+      </div>
+      <div class="summary-right">
+        <div class="summary-emoji" id="summary-emoji"></div>
+        <div class="summary-msg"   id="summary-msg"></div>
+        <div class="summary-chips" id="summary-chips"></div>
+      </div>
+    </div>
+
+    <!-- Grade Breakdown -->
+    <div class="grade-breakdown" id="grade-breakdown"></div>
+
+    <!-- Subject Progress Bars -->
+    <div class="subject-bars" id="subject-bars"></div>
+
+    <!-- Tabs -->
+    <div class="modal-tabs scrollbar-none" id="modal-tabs"></div>
+
+    <!-- Tab Content -->
+    <div class="modal-tab-content" id="tab-content"></div>
+
+    <!-- Action Buttons -->
+    <div class="modal-actions">
+      <button class="action-btn default" onclick="copyResult()">📋 Copy</button>
+      <button class="action-btn default" onclick="downloadTxt()">📄 .txt</button>
+      <button class="action-btn default" onclick="downloadHTML()">🌐 HTML</button>
+      <button class="action-btn save"    onclick="saveSemester()">💾 Save Semester</button>
+      <button class="action-btn print"   onclick="window.print()">🖨️ Print / PDF</button>
+    </div>
+
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

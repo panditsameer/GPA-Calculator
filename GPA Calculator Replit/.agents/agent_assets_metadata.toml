@@ -1,0 +1,14 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "rk1hatvSjWONcwqtOVwWb"
+uri = "file://neb-gpa-calculator-site.tar.gz"
+type = "unspecified"
+title = "NEB GPA Calculator — Built Site"
+
+[[outputs]]
+id = "FbqRK5azlzfOeGpBd9POa"
+uri = "file://neb-gpa-calculator-local.tar.gz"
+type = "unspecified"
+title = "NEB GPA Calculator — Local Version"
